@@ -2325,6 +2325,72 @@ namespace ClassicUO.Game.UI.Gumps
                     layerDepth
                 );
             }
+
+            // --- Draw navigation destination marker (from plugin pathfinding) ---
+            DrawNavDestination(batcher, gX, gY, halfWidth, halfHeight, layerDepth);
+        }
+
+        private static Point? _navDest;
+        private static DateTime _navDestSetTime;
+
+        private void DrawNavDestination(UltimaBatcher2D batcher, int gX, int gY, int halfWidth, int halfHeight, float layerDepth)
+        {
+            if (_navDest == null) return;
+
+            // Check if plugin signalled cancel/done
+            try
+            {
+                string clearFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "cuo_nav_clear.txt");
+                if (System.IO.File.Exists(clearFile))
+                {
+                    System.IO.File.Delete(clearFile);
+                    _navDest = null;
+                    return;
+                }
+            }
+            catch { }
+
+            // Don't auto-clear for at least 2 seconds (prevents clearing on nearby clicks)
+            bool canAutoClear = (DateTime.UtcNow - _navDestSetTime).TotalSeconds > 2.0;
+
+            if (canAutoClear && World.Player != null)
+            {
+                int dx = World.Player.X - _navDest.Value.X;
+                int dy = World.Player.Y - _navDest.Value.Y;
+                if (dx * dx + dy * dy <= 9)
+                {
+                    _navDest = null;
+                    return;
+                }
+            }
+
+            int sx = _navDest.Value.X - _center.X;
+            int sy = _navDest.Value.Y - _center.Y;
+
+            Point rot = RotatePoint(sx, sy, Zoom, 1, _flipMap ? 45f : 0f);
+            AdjustPosition(rot.X, rot.Y, halfWidth * 2 - 4, halfHeight * 2 - 4, out rot.X, out rot.Y);
+            rot.X += gX + halfWidth;
+            rot.Y += gY + halfHeight;
+
+            if (rot.X < gX || rot.X > gX + Width - 8 || rot.Y < gY || rot.Y > gY + Height - 8)
+                return;
+
+            const int SIZE = 8;
+            const int HALF = SIZE / 2;
+            Vector3 hue = ShaderHueTranslator.GetHueVector(0);
+
+            // Draw orange destination marker
+            Color navColor = new Color(255, 80, 40);
+            batcher.Draw(SolidColorTextureCache.GetTexture(navColor),
+                new Rectangle(rot.X - HALF, rot.Y - HALF, SIZE, SIZE), hue, layerDepth);
+
+            // Label
+            string label = $"Nav: {_navDest.Value.X},{_navDest.Value.Y}";
+            Vector3 labelHue = new(0f, 1f, 1f);
+            batcher.DrawString(Fonts.Regular, label, rot.X + HALF + 2, rot.Y - HALF, labelHue, layerDepth);
+            labelHue = ShaderHueTranslator.GetHueVector(0x0021);
+            labelHue.Y = 1;
+            batcher.DrawString(Fonts.Regular, label, rot.X + HALF + 1, rot.Y - HALF - 1, labelHue, layerDepth);
         }
 
         private void DrawMobile
@@ -3093,18 +3159,19 @@ namespace ClassicUO.Game.UI.Gumps
                 {
                     CanvasToWorld(x, y, out _mouseCenter.X, out _mouseCenter.Y);
 
-                    // Check if file is loaded and contain markers
-                    var userFile = _markerFiles.Where(f => f.Name == USER_MARKERS_FILE).FirstOrDefault();
+                    // Store destination in memory for the map marker
+                    _navDest = new Point(_mouseCenter.X, _mouseCenter.Y);
+                    _navDestSetTime = DateTime.UtcNow;
 
-                    if (userFile == null)
+                    // Write coordinates for plugin navigation (file-based IPC).
+                    try
                     {
-                        return;
+                        var navFile = System.IO.Path.Combine(
+                            System.IO.Path.GetTempPath(), "cuo_nav_request.txt");
+                        System.IO.File.WriteAllText(navFile,
+                            $"{_mouseCenter.X},{_mouseCenter.Y}");
                     }
-
-                    UserMarkersGump existingGump = UIManager.GetGump<UserMarkersGump>();
-
-                    existingGump?.Dispose();
-                    UIManager.Add(new UserMarkersGump(World, _mouseCenter.X, _mouseCenter.Y, userFile.Markers));
+                    catch { }
                 }
             }
 
