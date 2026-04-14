@@ -1420,8 +1420,13 @@ namespace ClassicUO.Network
                         }
                     }
 
-                    // Grid container: if enabled, use grid view instead of traditional
-                    if (ProfileManager.CurrentProfile.UseGridLayoutContainerGumps && graphic != 0x091A)
+                    // Grid container: check per-type toggle
+                    bool isBackpack = item.Serial == world.Player?.FindItemByLayer(Layer.Backpack)?.Serial;
+                    bool useGrid = ProfileManager.CurrentProfile.UseGridLayoutContainerGumps
+                        || (isBackpack && ProfileManager.CurrentProfile.UseGridLayoutForBackpack)
+                        || (!isBackpack && ProfileManager.CurrentProfile.UseGridLayoutForContainers);
+
+                    if (useGrid && graphic != 0x091A)
                     {
                         GridContainer.OpenOrUpdate(world, serial, graphic);
                         return;

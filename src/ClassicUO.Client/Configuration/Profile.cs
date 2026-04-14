@@ -358,6 +358,8 @@ namespace ClassicUO.Configuration
 
         // Grid Container
         public bool UseGridLayoutContainerGumps { get; set; } = false;
+        public bool UseGridLayoutForBackpack { get; set; } = false;
+        public bool UseGridLayoutForContainers { get; set; } = false;
         public bool GridContainersDefaultToOldStyleView { get; set; } = false;
         public int GridContainerSearchMode { get; set; } = 1;
         public bool EnableGridContainerAnchor { get; set; } = false;

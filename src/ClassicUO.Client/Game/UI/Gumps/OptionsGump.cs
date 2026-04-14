@@ -75,7 +75,7 @@ namespace ClassicUO.Game.UI.Gumps
         // GameWindowSize
         private InputField _gameWindowWidth;
         private Combobox _gridLoot;
-        private Checkbox _useGridContainers;
+        private Checkbox _useGridContainers, _useGridBackpack, _useGridForContainers;
         private Checkbox _hideScreenshotStoredInMessage;
         private Checkbox _highlightObjects, /*_smoothMovements,*/
                          _enablePathfind,
@@ -3533,11 +3533,22 @@ namespace ClassicUO.Game.UI.Gumps
 
             startY += button.Height + 2 + 10;
 
-            _useGridContainers = AddCheckBox
+            _useGridBackpack = AddCheckBox
             (
                 rightArea,
-                "Use Grid Backpack",
-                _currentProfile.UseGridLayoutContainerGumps,
+                "Grid Backpack",
+                _currentProfile.UseGridLayoutForBackpack,
+                startX,
+                startY
+            );
+
+            startY += _useGridBackpack.Height + 2;
+
+            _useGridForContainers = AddCheckBox
+            (
+                rightArea,
+                "Grid Containers (chests, boxes, crates)",
+                _currentProfile.UseGridLayoutForContainers,
                 startX,
                 startY
             );
@@ -3634,7 +3645,8 @@ namespace ClassicUO.Game.UI.Gumps
                     _showCorpseNameIncoming.IsChecked = true;
                     _showMobileNameIncoming.IsChecked = true;
                     _gridLoot.SelectedIndex = 0;
-                    _useGridContainers.IsChecked = false;
+                    _useGridBackpack.IsChecked = false;
+                    _useGridForContainers.IsChecked = false;
                     _sallosEasyGrab.IsChecked = false;
                     _partyInviteGump.IsChecked = false;
                     _showHouseContent.IsChecked = false;
@@ -3932,7 +3944,8 @@ namespace ClassicUO.Game.UI.Gumps
             _currentProfile.ShowNewMobileNameIncoming = _showMobileNameIncoming.IsChecked;
             _currentProfile.ShowNewCorpseNameIncoming = _showCorpseNameIncoming.IsChecked;
             _currentProfile.GridLootType = _gridLoot.SelectedIndex;
-            _currentProfile.UseGridLayoutContainerGumps = _useGridContainers.IsChecked;
+            _currentProfile.UseGridLayoutForBackpack = _useGridBackpack.IsChecked;
+            _currentProfile.UseGridLayoutForContainers = _useGridForContainers.IsChecked;
             _currentProfile.SallosEasyGrab = _sallosEasyGrab.IsChecked;
             _currentProfile.PartyInviteGump = _partyInviteGump.IsChecked;
             _currentProfile.UseObjectsFading = _objectsFading.IsChecked;
