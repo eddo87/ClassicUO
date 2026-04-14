@@ -173,6 +173,20 @@ namespace ClassicUO.Utility
 #endif
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ToHtmlHex(this Color color) => $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Color FromHtmlHex(this string hex)
+        {
+            if (string.IsNullOrEmpty(hex)) return Color.White;
+            if (hex.StartsWith("#")) hex = hex.Substring(1);
+            if (hex.Length != 6) return Color.White;
+
+            int value = Convert.ToInt32(hex, 16);
+            return new Color((value >> 16) & 0xFF, (value >> 8) & 0xFF, value & 0xFF);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ToHex(this uint serial)
         {
             return $"0x{serial:X8}";

@@ -9,6 +9,7 @@ namespace ClassicUO.Game.UI.Gumps
     internal abstract class ResizableGump : Gump
     {
         private readonly BorderControl _borderControl;
+        protected BorderControl BorderControl => _borderControl;
         private readonly Button _button;
         private bool _clicked;
         private Point _lastSize, _savedSize, _beforeResizeSize;

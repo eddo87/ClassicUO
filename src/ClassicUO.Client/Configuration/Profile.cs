@@ -14,6 +14,7 @@ using ClassicUO.Game.Data;
 using ClassicUO.Game.GameObjects;
 using ClassicUO.Game.Managers;
 using ClassicUO.Game.UI.Gumps;
+using ClassicUO.Game.UI.Gumps.GridHighLight;
 using ClassicUO.Utility.Logging;
 using Microsoft.Xna.Framework;
 
@@ -354,6 +355,58 @@ namespace ClassicUO.Configuration
         };
 
         public bool OverheadPartyMessages { get; set; }
+
+        // Grid Container
+        public bool UseGridLayoutContainerGumps { get; set; } = false;
+        public bool GridContainersDefaultToOldStyleView { get; set; } = false;
+        public int GridContainerSearchMode { get; set; } = 1;
+        public bool EnableGridContainerAnchor { get; set; } = false;
+        public byte GridBorderAlpha { get; set; } = 75;
+        public ushort GridBorderHue { get; set; } = 0;
+        public byte GridContainersScale { get; set; } = 100;
+        public bool GridContainerScaleItems { get; set; } = true;
+        public bool GridEnableContPreview { get; set; } = true;
+        public int Grid_BorderStyle { get; set; } = 0;
+        public int Grid_DefaultColumns { get; set; } = 5;
+        public int Grid_DefaultRows { get; set; } = 5;
+        public bool Grid_UseContainerHue { get; set; } = false;
+        public bool Grid_HideBorder { get; set; } = false;
+        public ushort AltGridContainerBackgroundHue { get; set; } = 0x0000;
+        public bool DisableTargetingGridContainers { get; set; } = false;
+        public bool CorpseSingleClickLoot { get; set; } = false;
+        public bool BackPackLocked { get; set; } = false;
+        public int GridHighlightSize { get; set; } = 1;
+        public bool GridHighlightProperties { get; set; } = true;
+        public bool GridHighlightShowRuleName { get; set; } = true;
+        public bool GridHighlight_CorpseOnly { get; set; } = false;
+
+        public byte ContainerOpacity { get; set; } = 100;
+        public bool EnableAutoLoot { get; set; } = false;
+
+        // GridHighLight system data
+        public List<GridHighlightSetupEntry> GridHighlightSetup { get; set; } = new();
+        public List<string> ConfigurableProperties { get; set; } = new();
+        public List<string> ConfigurableResistances { get; set; } = new();
+        public List<string> ConfigurableNegatives { get; set; } = new();
+        public List<string> ConfigurableSuperSlayers { get; set; } = new();
+        public List<string> ConfigurableSlayers { get; set; } = new();
+        public List<string> ConfigurableRarities { get; set; } = new();
+
+        // Legacy GridHighlight fields for migration
+        public List<string> GridHighlight_Name { get; set; } = new();
+        public List<ushort> GridHighlight_Hue { get; set; } = new();
+        public List<List<string>> GridHighlight_PropNames { get; set; } = new();
+        public List<List<int>> GridHighlight_PropMinVal { get; set; } = new();
+        public List<bool> GridHighlight_AcceptExtraProperties { get; set; } = new();
+        public List<List<bool>> GridHighlight_IsOptionalProperties { get; set; } = new();
+        public List<List<string>> GridHighlight_ExcludeNegatives { get; set; } = new();
+        public List<List<string>> GridHighlight_RequiredRarities { get; set; } = new();
+
+        [JsonConverter(typeof(Point2Converter))]
+        public Point BackpackGridPosition { get; set; } = new Point(100, 100);
+
+        [JsonConverter(typeof(Point2Converter))]
+        public Point BackpackGridSize { get; set; } = new Point(300, 300);
 
         public void Save(World world, string path)
         {

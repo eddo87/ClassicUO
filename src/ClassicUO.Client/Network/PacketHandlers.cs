@@ -1420,6 +1420,13 @@ namespace ClassicUO.Network
                         }
                     }
 
+                    // Grid container: if enabled, use grid view instead of traditional
+                    if (ProfileManager.CurrentProfile.UseGridLayoutContainerGumps && graphic != 0x091A)
+                    {
+                        GridContainer.OpenOrUpdate(world, serial, graphic);
+                        return;
+                    }
+
                     ContainerGump container = UIManager.GetGump<ContainerGump>(serial);
                     bool playsound = false;
                     int x,

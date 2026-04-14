@@ -89,6 +89,8 @@ namespace ClassicUO.Game
 
         public const int MAX_JOURNAL_HISTORY_COUNT = 100;
 
+        public const ushort HUE_ERROR = 0x0021;
+
         public const byte MIN_CONTAINER_SIZE_PERC = 50;
         public const byte MAX_CONTAINER_SIZE_PERC = 200;
 

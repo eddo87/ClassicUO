@@ -66,6 +66,13 @@ namespace ClassicUO.Game.GameObjects
         private ushort? _displayedGraphic;
         private bool _isMulti;
 
+        // GridHighLight system fields
+        public bool MatchesHighlightData;
+        public Color HighlightColor = Color.White;
+        public string HighlightName = string.Empty;
+        public bool ShouldAutoLoot;
+        public bool HighlightChecked;
+
         public Item(World world) : base(world, 0) { }
 
         public bool IsCoin => Graphic == 0x0EEA || Graphic == 0x0EED || Graphic == 0x0EF0;

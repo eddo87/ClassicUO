@@ -291,10 +291,20 @@ namespace ClassicUO.Game.UI.Gumps
 
     internal class BorderControl : Control
     {
-        public int BorderSize { get; internal set; }
+        public int BorderSize { get; set; }
 
-        const ushort H_BORDER = 0x0A8C;
-        const ushort V_BORDER = 0x0A8D;
+        private const ushort DEFAULT_H_BORDER = 0x0A8C;
+        private const ushort DEFAULT_V_BORDER = 0x0A8D;
+
+        // Extended border graphics (used by GridContainer border styles)
+        public ushort T_Left { get; set; }
+        public ushort H_Border { get; set; } = DEFAULT_H_BORDER;
+        public ushort T_Right { get; set; }
+        public ushort V_Border { get; set; } = DEFAULT_V_BORDER;
+        public ushort V_Right_Border { get; set; }
+        public ushort B_Left { get; set; }
+        public ushort H_Bottom_Border { get; set; }
+        public ushort B_Right { get; set; }
 
         public BorderControl(int x, int y, int w, int h, int borderSize)
         {
@@ -308,6 +318,22 @@ namespace ClassicUO.Game.UI.Gumps
         }
 
         public ushort Hue { get; set; }
+
+        /// <summary>
+        /// Resets all border graphics to the default values.
+        /// </summary>
+        public void DefaultGraphics()
+        {
+            H_Border = DEFAULT_H_BORDER;
+            V_Border = DEFAULT_V_BORDER;
+            T_Left = 0;
+            T_Right = 0;
+            V_Right_Border = 0;
+            B_Left = 0;
+            H_Bottom_Border = 0;
+            B_Right = 0;
+            BorderSize = 4;
+        }
 
         public override bool AddToRenderLists(RenderLists renderLists, int x, int y, ref float layerDepthRef)
         {
@@ -323,7 +349,7 @@ namespace ClassicUO.Game.UI.Gumps
             renderLists.AddGumpWithAtlas(
                 (batcher) =>
                 {
-                    ref readonly var gumpInfo = ref Client.Game.UO.Gumps.GetGump(H_BORDER);
+                    ref readonly var gumpInfo = ref Client.Game.UO.Gumps.GetGump(H_Border);
 
                     // sopra
                     batcher.DrawTiled(
@@ -335,15 +361,17 @@ namespace ClassicUO.Game.UI.Gumps
                     );
 
                     // sotto
+                    ushort bottomH = H_Bottom_Border != 0 ? H_Bottom_Border : H_Border;
+                    var bottomInfo = Client.Game.UO.Gumps.GetGump(bottomH);
                     batcher.DrawTiled(
-                        gumpInfo.Texture,
+                        bottomInfo.Texture,
                         new Rectangle(x, y + Height - BorderSize, Width, BorderSize),
-                        gumpInfo.UV,
+                        bottomInfo.UV,
                         hueVector,
                         layerDepth
                     );
 
-                    gumpInfo = ref Client.Game.UO.Gumps.GetGump(V_BORDER);
+                    gumpInfo = ref Client.Game.UO.Gumps.GetGump(V_Border);
                     //sx
                     batcher.DrawTiled(
                         gumpInfo.Texture,
@@ -354,18 +382,47 @@ namespace ClassicUO.Game.UI.Gumps
                     );
 
                     //dx
+                    ushort rightV = V_Right_Border != 0 ? V_Right_Border : V_Border;
+                    var rightInfo = Client.Game.UO.Gumps.GetGump(rightV);
                     batcher.DrawTiled(
-                        gumpInfo.Texture,
+                        rightInfo.Texture,
                         new Rectangle(
                             x + Width - BorderSize,
-                            y + (gumpInfo.UV.Width >> 1),
+                            y + (rightInfo.UV.Width >> 1),
                             BorderSize,
                             Height - BorderSize
                         ),
-                        gumpInfo.UV,
+                        rightInfo.UV,
                         hueVector,
                         layerDepth
                     );
+
+                    // Corner pieces (if set)
+                    if (T_Left != 0)
+                    {
+                        var tl = Client.Game.UO.Gumps.GetGump(T_Left);
+                        if (tl.Texture != null)
+                            batcher.Draw(tl.Texture, new Rectangle(x, y, BorderSize, BorderSize), tl.UV, hueVector, 0, default, default, layerDepth);
+                    }
+                    if (T_Right != 0)
+                    {
+                        var tr = Client.Game.UO.Gumps.GetGump(T_Right);
+                        if (tr.Texture != null)
+                            batcher.Draw(tr.Texture, new Rectangle(x + Width - BorderSize, y, BorderSize, BorderSize), tr.UV, hueVector, 0, default, default, layerDepth);
+                    }
+                    if (B_Left != 0)
+                    {
+                        var bl = Client.Game.UO.Gumps.GetGump(B_Left);
+                        if (bl.Texture != null)
+                            batcher.Draw(bl.Texture, new Rectangle(x, y + Height - BorderSize, BorderSize, BorderSize), bl.UV, hueVector, 0, default, default, layerDepth);
+                    }
+                    if (B_Right != 0)
+                    {
+                        var br = Client.Game.UO.Gumps.GetGump(B_Right);
+                        if (br.Texture != null)
+                            batcher.Draw(br.Texture, new Rectangle(x + Width - BorderSize, y + Height - BorderSize, BorderSize, BorderSize), br.UV, hueVector, 0, default, default, layerDepth);
+                    }
+
                     return true;
                 }
             );
